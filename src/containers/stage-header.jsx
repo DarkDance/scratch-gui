@@ -61,8 +61,16 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     onSetStageLarge: () => dispatch(setStageSize(STAGE_SIZE_MODES.large)),
     onSetStageSmall: () => dispatch(setStageSize(STAGE_SIZE_MODES.small)),
-    onSetStageFull: () => dispatch(setFullScreen(true)),
-    onSetStageUnFull: () => dispatch(setFullScreen(false))
+    onSetStageFull: () => {
+        if(window.scratchConfig && window.scratchConfig.stageArea && window.scratchConfig.stageArea.fullscreenButton.handleBeforeSetStageFull()){
+            dispatch(setFullScreen(true))
+        }
+    },
+    onSetStageUnFull: () => {
+        if(window.scratchConfig && window.scratchConfig.stageArea && window.scratchConfig.stageArea.fullscreenButton.handleBeforeSetStageUnFull()){
+            dispatch(setFullScreen(false))
+        }
+    }
 });
 
 export default connect(

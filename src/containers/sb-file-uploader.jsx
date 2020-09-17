@@ -147,8 +147,10 @@ class SBFileUploader extends React.Component {
         }
     }
     handleClick () {
-        // open filesystem browsing window
-        this.fileInput.click();
+        if(window.scratchConfig && window.scratchConfig.menuBar.loadFileButton && window.scratchConfig.menuBar.loadFileButton.handleBefore()){
+           // open filesystem browsing window
+           this.fileInput.click();
+        } 
     }
     setFileInput (input) {
         this.fileInput = input;

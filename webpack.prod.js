@@ -1,11 +1,12 @@
 const defaultsDeep = require('lodash.defaultsdeep');
 var path = require('path');
 var webpack = require('webpack');
+const TerserPlugin = require('terser-webpack-plugin');
 
 // Plugins
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+// var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 // PostCss
 var autoprefixer = require('autoprefixer');
@@ -15,8 +16,8 @@ var postcssImport = require('postcss-import');
 const STATIC_PATH = process.env.STATIC_PATH || '/static';
 
 const base = {
-    mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-    devtool: 'cheap-module-source-map',
+    mode: 'production',
+    devtool: 'hidden-source-map', // 'cheap-module-source-map',
     devServer: {
         contentBase: path.resolve(__dirname, 'build'),
         host: '0.0.0.0',
@@ -55,7 +56,10 @@ const base = {
                     ['react-intl', {
                         messagesDir: './translations/messages/'
                     }]],
-                presets: ['@babel/preset-env', '@babel/preset-react']
+                presets: [
+                    ['@babel/preset-env', {targets: {browsers: ['last 3 versions', 'Safari >= 8', 'iOS >= 8']}}],
+                    '@babel/preset-react'
+                ]
             }
         },
         {
@@ -78,7 +82,9 @@ const base = {
                         return [
                             postcssImport,
                             postcssVars,
-                            autoprefixer
+                            autoprefixer({
+                                browsers: ['last 3 versions', 'Safari >= 8', 'iOS >= 8']
+                            })
                         ];
                     }
                 }
@@ -86,31 +92,11 @@ const base = {
         }]
     },
     optimization: {
-        minimizer: [
-            // new UglifyJsPlugin({
-            //     include: /\.min\.js$/
-            // })
-            new UglifyJsPlugin({
-                include: /\.min\.js$/,
-                uglifyOptions: {
-                    compress: {
-                        warnings: false,
-                        drop_debugger: true, // 去掉debugger
-                        drop_console: true, // 去掉console
-                        pure_funcs: ['console.log']// 移除console
-                    }
-                },
-                sourceMap: true,
-                parallel: true
-            })
-        ]
+        minimize: true,
+        minimizer: [new TerserPlugin()]
     },
     plugins: []
 };
-
-if (!process.env.CI) {
-    base.plugins.push(new webpack.ProgressPlugin());
-}
 
 module.exports = [
     // to run editor examples
@@ -154,7 +140,6 @@ module.exports = [
             new webpack.DefinePlugin({
                 'process.env.NODE_ENV': '"' + process.env.NODE_ENV + '"',
                 'process.env.DEBUG': Boolean(process.env.DEBUG),
-                // 'process.env.GA_ID': '"' + (process.env.GA_ID || 'UA-000000-01') + '"'
                 'process.env.GA_ID': '"' + (process.env.GA_ID || 'UA-155190299-1') + '"'
             }),
             new HtmlWebpackPlugin({
@@ -177,7 +162,6 @@ module.exports = [
             }),
             new HtmlWebpackPlugin({
                 chunks: ['lib.min', 'player'],
-                // template: 'src/playground/index.ejs',
                 template: 'src/playground/player.ejs',
                 filename: 'player.html',
                 title: 'Scratch 3.0 GUI: Player Example'
@@ -197,7 +181,7 @@ module.exports = [
             }]),
             new CopyWebpackPlugin([{
                 from: 'extension-worker.{js,js.map}',
-                context: 'node_modules/scratch-vm/dist/web'
+                context: 'node_modules/@tangguobiancheng/scratch-vm/dist/web'
             }])
         ])
     })
@@ -237,13 +221,7 @@ module.exports = [
                 }]),
                 new CopyWebpackPlugin([{
                     from: 'extension-worker.{js,js.map}',
-                    context: 'node_modules/scratch-vm/dist/web'
-                }]),
-                // Include library JSON files for scratch-desktop to use for downloading
-                new CopyWebpackPlugin([{
-                    from: 'src/lib/libraries/*.json',
-                    to: 'libraries',
-                    flatten: true
+                    context: 'node_modules/@tangguobiancheng/scratch-vm/dist/web'
                 }])
             ])
         })) : []

@@ -146,26 +146,30 @@ const StageHeaderComponent = function (props) {
                     </div>
                 </div>
             );
-        header = (
-            <Box className={styles.stageHeaderWrapper}>
+        header = (!isPlayerOnly || (window.scratchConfig && window.scratchConfig.stageArea && window.scratchConfig.stageArea.showControl)) && (
+            <Box className={isPlayerOnly?styles.stageHeaderWrapperOverlay:styles.stageHeaderWrapper}>
                 <Box className={styles.stageMenuWrapper}>
                     <Controls vm={vm} />
                     <div className={styles.stageSizeRow}>
                         {stageControls}
-                        <div>
-                            <Button
-                                className={styles.stageButton}
-                                onClick={onSetStageFull}
-                            >
-                                <img
-                                    alt={props.intl.formatMessage(messages.fullStageSizeMessage)}
-                                    className={styles.stageButtonIcon}
-                                    draggable={false}
-                                    src={fullScreenIcon}
-                                    title={props.intl.formatMessage(messages.fullscreenControl)}
-                                />
-                            </Button>
-                        </div>
+                        {
+                            (!isPlayerOnly || (window.scratchConfig && window.scratchConfig.stageArea && window.scratchConfig.stageArea.fullscreenButton.show)) && (
+                                <div>
+                                    <Button
+                                        className={styles.stageButton}
+                                        onClick={onSetStageFull}
+                                    >
+                                        <img
+                                            alt={props.intl.formatMessage(messages.fullStageSizeMessage)}
+                                            className={styles.stageButtonIcon}
+                                            draggable={false}
+                                            src={fullScreenIcon}
+                                            title={props.intl.formatMessage(messages.fullscreenControl)}
+                                        />
+                                    </Button>
+                                </div>
+                            )
+                        }
                     </div>
                 </Box>
             </Box>
