@@ -498,3 +498,11 @@ function regKeyEvent(selector, key, keyCode) {
   regKeyEvent(".button_right", "ArrowRight", 39)
 
 ```
+
+
+备注：
+怎么样和fork分支一起工作
+1. 查看当前仓库情况：git remote -v
+2. 将远程fork仓库添加进来git remote add (alias) (git address)
+3. 获取fork仓库的更新git fetch (alias) (forked-branch-name)
+4. 常规分支合并即可
